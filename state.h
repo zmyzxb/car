@@ -1,8 +1,17 @@
 #include "zigbee.h"
-class state{
+class State{
 public:
+  State(){
+      cdir = 0, cx = 6, cy = 2;
+  }
+  //小车
+  int cdir,cx,cy;
+
+  //障碍
   int PackagePos[8][2];
   int barrier[8][8][2];
+  int X[10],Y[10];
+  int Map[10][10];
 
   void trans(int &a,int &b) {
     if(42<=a&&a<=62){a=1;}
@@ -61,3 +70,98 @@ public:
     }
   }
 };
+
+/*
+int _hs(){
+    int t=0;
+    for(int i=0;i<6;i++)
+      t+=(i+1)*(gst->PackagePos[i][0])+(i+5)*gst->PackagePos[i][1];
+    return t;
+}
+
+int prev[12];
+int get_hs(){
+     for(int i=0;i<6;i++)
+        prev[i]=-i;
+      for(int i=0,j=0;;i++){
+        receive_data();
+        gst->getpackage();
+        //get_pass();
+        bool f=0;int s=_hs();
+        for(int k=0;k<10;k++)
+          if(prev[k]!=s)f=1;
+        if(i%10==0){
+          prev[j]=s;
+          j++;
+          if(j>=10)j=0;
+        }
+        if(s>20&&!f)return s;
+        Serial.println(s);
+        delay(10);
+     }
+}
+
+int fff=0;
+int get_startpos(){
+     for(int i=0;i<6;i++)
+        prev[i]=-i;
+      for(int i=0,j=0;;i++){
+        receive_data();
+        gst->getpackage();
+        //get_pass();
+        bool f=0;int s=getPassengerstartposX();
+        for(int k=0;k<10;k++)
+          if(prev[k]!=s)f=1;
+        if(i%10==0){
+          prev[j]=s;
+          j++;
+          if(j>=10)j=0;
+        }
+        if(s>20&&!f){if(!fff)fff=1,gst->get_pass();return s;}
+        //Serial.println(s);
+        delay(10);
+     }
+}
+
+int get_finalpos(){
+     for(int i=0;i<6;i++)
+        prev[i]=-i;
+      for(int i=0,j=0;;i++){
+        receive_data();
+        gst->getpackage();
+        //get_pass();
+        bool f=0;int s=getPassengerfinalposX();
+        for(int k=0;k<10;k++)
+          if(prev[k]!=s)f=1;
+        if(i%10==0){
+          prev[j]=s;
+          j++;
+          if(j>=10)j=0;
+        }
+        if(s>20&&!f)return s;
+        //Serial.println(s);
+        delay(10);
+     }
+}
+
+
+int get_task(){
+   for(int i=0;i<6;i++)
+        prev[i]=-i;
+      for(int i=0,j=0;;i++){
+        receive_data();
+        bool f=0;int s=getCartask();
+        gst->get_pass();
+        for(int k=0;k<10;k++)
+          if(prev[k]!=s)f=1;
+        if(i%10==0){
+          prev[j]=s;
+          j++;
+          if(j>=10)j=0;
+        }
+        if(s>-1&&!f)return s;
+        //Serial.println(s);
+        delay(10);
+    }
+}
+*/
