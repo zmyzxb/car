@@ -97,7 +97,7 @@ struct _mp {
       }
       return (dis2[x2][y2]==-1)?1000:dis2[x2][y2];
     }
-    
+     
   private:
     const int N = 6;
     const int PT = N*N+5; 
