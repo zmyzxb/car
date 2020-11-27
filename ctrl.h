@@ -19,7 +19,7 @@
 #define left 1
 #define down 2
 #define right 3
-#define up 0
+#define up 0 
 
 float Kt6 = 2, Kt5 = 1.5, Kt4 = 1.7, Kt3 = 1.8, Kt2 = 1.7, Kt1 = 1, Kt; //刹车时间系数
 float cs_delay_time = 170;
