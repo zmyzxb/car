@@ -78,7 +78,7 @@ int _hs(){
       t+=(i+1)*(gst->PackagePos[i][0])+(i+5)*gst->PackagePos[i][1];
     return t;
 }
-
+ 
 int prev[12];
 int get_hs(){
      for(int i=0;i<6;i++)
