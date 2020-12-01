@@ -1,10 +1,10 @@
+// #include "TimerOne.h"
 #define A_order 0
 #define B_order 1
 #define C_order 2
 #define D_order 3
 #define D1_Pin 34
 #define D2_Pin 23
-
 #define D3_Pin 35
 #define D4_Pin 25
 #define D5_Pin 36
@@ -22,18 +22,21 @@
 #define DL_Pin 22
 #define DR_Pin 24
 bool rush = 1;
+bool isOnLine = 0;
+int alreadyGo = 0;
 String stest = "33" /*7777777777777777888888888888888*/;
 int encoder_Pin[4][2] //[i][0]判断方向,[i][1]计数
     = {53, 3, 52, 18, 51, 2, 50, 19};
 float kspd = 1;
 const uint8_t PWM_PIN[4][2] = {7, 8, 11, 12, 6, 5, 44, 46}; //[7,8]左前轮(7>8前转) [11,12]右前，[6,5]左后，[44,46]右后
-float Kp = 40, Ki = 0, Kd = 10;
+float Kp = 10, Ki = 0, Kd = 10;
 float error = 0, P = 0, I = 0, D = 0, PID_value = 0, previous_error = 0, previous_I = 0;
-int sdspd, sdspd1 = 100, sdspd2 = 150, sdspd3=170, sdspd4, sdspd5, sdspd6, linespd = 150, turnspd = 200;
+int sdspd, sdspd1 = 100, sdspd2 = 150, sdspd3 = 170, sdspd4, sdspd5, sdspd6, linespd = 100, turnspd = 200;
 int D1, D2, D3, D4, D5, D6, D7, D8, D9, D10, D11, D12, D13, D14, D15, D16, DL, DR;
-unsigned long csgap[2] = {150,25};
+unsigned long csgap[2] = {150, 25};
 void pinint()
 {
+    pinMode(48, OUTPUT);
     pinMode(D1_Pin, INPUT);
     pinMode(D2_Pin, INPUT);
     pinMode(D3_Pin, INPUT);
@@ -57,6 +60,7 @@ void pinint()
 }
 void read_sensor_values()
 {
+    // digitalWrite(48,HIGH);
     D1 = digitalRead(D1_Pin);
     D2 = digitalRead(D2_Pin);
     D3 = digitalRead(D3_Pin);
@@ -75,6 +79,18 @@ void read_sensor_values()
     D16 = digitalRead(D16_Pin);
     DL = digitalRead(DL_Pin);
     DR = digitalRead(DR_Pin);
+    // if(D16) digitaiWirte(48,HIGH);
+    if (D16 && !isOnLine)
+    {
+        alreadyGo++;
+        isOnLine ^= 1;
+        // digitalWrite(48,HIGH);
+    }
+    else if (!D16 && isOnLine)
+    {
+        isOnLine ^= 1;
+        // digitalWrite(48,LOW);
+    }
 }
 void motorsWrite(int speedL, int speedR)
 {
@@ -193,120 +209,120 @@ void calc_pid()
 }
 void go_n_steps(int n)
 {
-    int m = 0;
+    // int m = 0;
     //unsigned long time1 = millis();
-    bool cs_find = 0;
-    read_sensor_values();
+    // bool cs_find = 0;
+    // read_sensor_values();
     //bool edge = 0;
     while (true)
     {
-        int flag = 1;
-        for (int i = 0; i < 15; i++)
-        {
-            delay(2);
-            read_sensor_values();
-            //if(millis()-time1>200&&(D16||D1))
-            //   edge=1;
-            /*if ((millis()-time1>200) 
+        // int flag = 1;
+        // for (int i = 0; i < 15; i++)
+        // {
+        // delay(2);
+        read_sensor_values();
+        //if(millis()-time1>200&&(D16||D1))
+        //   edge=1;
+        /*if ((millis()-time1>200) 
                     && ((D6&&D7)|| 
                         (D7&&D8)||
                         (D8&&D9)||
                         (D9&&D10)||
                         (D10&&D11||
                         (D11&&D12))) && edge)*/
-            if(!D1 && !D16) cs_find = 1;
-            if (cs_find && (D1 || D16))
-            // if (DL || DR)
-            {
-                m++;
-                cs_find=0;
-                // edge=0;
-               // time1 = millis();
-                if (m == n)
-                {
-                    shut_down(n);
-                    flag = 0;
-                    
-                    break;
-                }
-                // delay(cstime);
-            }
-            else if (D8 && D9) //8和9通道在线上
-            {
-                error = 0;
-            }
-            else if (D8 && !D9) //8通道在线上
-            {
-                error = -2;
-            }
-            else if (D9 && !D8) //9通道在线上
-            {
-                error = 2;
-            }
-            else if (D7) //7通道在线上
-            {
-                error = -3;
-            }
-            else if (D10) //10通道在线上
-            {
-                error = 3;
-            }
-            else if (D6) //6通道在线上
-            {
-                error = -4;
-            }
-            else if (D11) //11通道在线上
-            {
-                error = 4;
-            }
-            else if (D5) //5通道在线上
-            {
-                error = -5;
-            }
-            else if (D12) //12通道在线上
-            {
-                error = 5;
-            }
-            // else if (D4) //4通道在线上
+        // if (!D1 && !D16)
+        // cs_find = 1;
+        if (alreadyGo == n)
+        // if (DL || DR)
+        {
+            // m++;
+            // cs_find = 0;
+            // edge=0;
+            // time1 = millis();
+            // if (m == n)
             // {
-            //     error = -5;
-            // }
-            // else if (D13) //13通道在线上
-            // {
-            //     error = 5;
-            // }
-            // else if (D3) //3通道在线上
-            // {
-            //     error = -6;
-            // }
-            // else if (D14) //14通道在线上
-            // {
-            //     error = 6;
-            // }
-            // else if (D2) //2通道在线上
-            // {
-            //     error = -7;
-            // }
-            // else if (D15) //15通道在线上
-            // {
-            //     error = 7;
-            // }
-            // else if (D1) //1通道在线上
-            // {
-            //     error = -8;
-            // }
-            // else if (D16) //16通道在线上
-            // {
-            //     error = 8;
-            // }
-            else
-                error = error * 0.9;
-        }
-        if (!flag)
+            shut_down(n);
+            alreadyGo = 0;
+            // flag = 0;
             break;
+            // }
+            // delay(cstime);
+        }
+        else if (D8 && D9) //8和9通道在线上
+        {
+            error = 0;
+        }
+        else if (D8 && !D9) //8通道在线上
+        {
+            error = -2;
+        }
+        else if (D9 && !D8) //9通道在线上
+        {
+            error = 2;
+        }
+        else if (D7) //7通道在线上
+        {
+            error = -3;
+        }
+        else if (D10) //10通道在线上
+        {
+            error = 3;
+        }
+        else if (D6) //6通道在线上
+        {
+            error = -4;
+        }
+        else if (D11) //11通道在线上
+        {
+            error = 4;
+        }
+        else if (D5) //5通道在线上
+        {
+            error = -5;
+        }
+        else if (D12) //12通道在线上
+        {
+            error = 5;
+        }
+        // else if (D4) //4通道在线上
+        // {
+        //     error = -5;
+        // }
+        // else if (D13) //13通道在线上
+        // {
+        //     error = 5;
+        // }
+        // else if (D3) //3通道在线上
+        // {
+        //     error = -6;
+        // }
+        // else if (D14) //14通道在线上
+        // {
+        //     error = 6;
+        // }
+        // else if (D2) //2通道在线上
+        // {
+        //     error = -7;
+        // }
+        // else if (D15) //15通道在线上
+        // {
+        //     error = 7;
+        // }
+        // else if (D1) //1通道在线上
+        // {
+        //     error = -8;
+        // }
+        // else if (D16) //16通道在线上
+        // {
+        //     error = 8;
+        // }
+        else
+            error = error * 0.9;
         calc_pid();
         go_straight();
     }
+    // if (!flag)
+    // break;
 }
 void string_to_act(String s)
 {
@@ -357,7 +373,9 @@ void isRush()
 }
 void setup()
 {
-    Serial.begin(9600);
+    // Serial.begin(9600);
+    // Timer0.initialize(1000);
+    // Timer0.attachInterrupt(read_sensor_values);
     attachInterrupt(1, isRush, CHANGE);
     pinint();
     string_to_act(stest);
