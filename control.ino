@@ -29,9 +29,9 @@ int encoder_Pin[4][2] //[i][0]判断方向,[i][1]计数
     = {53, 3, 52, 18, 51, 2, 50, 19};
 float kspd = 1;
 const uint8_t PWM_PIN[4][2] = {7, 8, 11, 12, 6, 5, 44, 46}; //[7,8]左前轮(7>8前转) [11,12]右前，[6,5]左后，[44,46]右后
-float Kp = 10, Ki = 0, Kd = 10;
+float Kp = 25, Ki = 0, Kd = 10;
 float error = 0, P = 0, I = 0, D = 0, PID_value = 0, previous_error = 0, previous_I = 0;
-int sdspd, sdspd1 = 100, sdspd2 = 150, sdspd3 = 170, sdspd4, sdspd5, sdspd6, linespd = 100, turnspd = 200;
+int sdspd, sdspd1 = 100, sdspd2 = 180, sdspd3 = 200, sdspd4, sdspd5, sdspd6, linespd = 180, turnspd = 200;
 int D1, D2, D3, D4, D5, D6, D7, D8, D9, D10, D11, D12, D13, D14, D15, D16, DL, DR;
 unsigned long csgap[2] = {150, 25};
 void pinint()
@@ -79,7 +79,7 @@ void read_sensor_values()
     D16 = digitalRead(D16_Pin);
     DL = digitalRead(DL_Pin);
     DR = digitalRead(DR_Pin);
-    // if(D16) digitaiWirte(48,HIGH);
+//     if(D16) {digitalWrite(48,HIGH);delay(500);digitalWrite(48,LOW);}
     if (D16 && !isOnLine)
     {
         alreadyGo++;
@@ -382,4 +382,5 @@ void setup()
 }
 void loop()
 {
+//  read_sensor_values();
 }
