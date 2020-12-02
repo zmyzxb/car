@@ -24,14 +24,14 @@
 bool rush = 1;
 bool isOnLine = 0;
 int alreadyGo = 0;
-String stest = "33" /*7777777777777777888888888888888*/;
+String stest = "777777777777777777777777" /*7777777777777777888888888888888*/;
 int encoder_Pin[4][2] //[i][0]判断方向,[i][1]计数
     = {53, 3, 52, 18, 51, 2, 50, 19};
 float kspd = 1;
 const uint8_t PWM_PIN[4][2] = {7, 8, 11, 12, 6, 5, 44, 46}; //[7,8]左前轮(7>8前转) [11,12]右前，[6,5]左后，[44,46]右后
-float Kp = 25, Ki = 0, Kd = 10;
+float Kp = 30, Ki = 0, Kd = 500;
 float error = 0, P = 0, I = 0, D = 0, PID_value = 0, previous_error = 0, previous_I = 0;
-int sdspd, sdspd1 = 100, sdspd2 = 180, sdspd3 = 200, sdspd4, sdspd5, sdspd6, linespd = 180, turnspd = 200;
+int sdspd, sdspd1 = 100, sdspd2 = 180, sdspd3 = 250, sdspd4, sdspd5, sdspd6, linespd = 180, turnspd = 150;
 int D1, D2, D3, D4, D5, D6, D7, D8, D9, D10, D11, D12, D13, D14, D15, D16, DL, DR;
 unsigned long csgap[2] = {150, 25};
 void pinint()
@@ -79,14 +79,14 @@ void read_sensor_values()
     D16 = digitalRead(D16_Pin);
     DL = digitalRead(DL_Pin);
     DR = digitalRead(DR_Pin);
-//     if(D16) {digitalWrite(48,HIGH);delay(500);digitalWrite(48,LOW);}
-    if (D16 && !isOnLine)
+    //     if(D16) {digitalWrite(48,HIGH);delay(500);digitalWrite(48,LOW);}
+    if (D5 && D12 && !isOnLine)
     {
         alreadyGo++;
         isOnLine ^= 1;
         // digitalWrite(48,HIGH);
     }
-    else if (!D16 && isOnLine)
+    else if (!D5 && !D12 && isOnLine)
     {
         isOnLine ^= 1;
         // digitalWrite(48,LOW);
@@ -149,29 +149,48 @@ void go_straight()
 }
 void turn_left()
 {
-
+    motorsWrite(-turnspd * kspd, turnspd * kspd);
+    while (!digitalRead(D1_Pin))
+    {
+    }
+    motorsWrite(-turnspd * kspd * 0.5, turnspd * kspd * 0.5);
     while (!digitalRead(D7_Pin))
     {
-        motorsWrite(-turnspd * kspd, turnspd * kspd);
     }
-    while (digitalRead(D9_Pin) || digitalRead(D10_Pin) || digitalRead(D11_Pin))
-    {
-        motorsWrite(turnspd * kspd, -turnspd * kspd);
-    }
+    // motorsWrite(-turnspd * kspd*0.5, turnspd * kspd*0.5);
+    // while (!digitalRead(D7_Pin))
+    // {
+    // }
+    // pull_off();
+    // while (digitalRead(D9_Pin) || digitalRead(D10_Pin) || digitalRead(D11_Pin))
+    // {
+    //     motorsWrite(turnspd * kspd, -turnspd * kspd);
+    // }
     pull_off();
+    delay(300);
 }
 void turn_right()
 {
 
-    while (!digitalRead(D9_Pin))
+    motorsWrite(turnspd * kspd, -turnspd * kspd);
+    while (!digitalRead(D16_Pin))
     {
-        motorsWrite(turnspd * kspd, -turnspd * kspd);
     }
-    while (digitalRead(D7_Pin) || digitalRead(D6_Pin) || digitalRead(D5_Pin))
+    motorsWrite(turnspd * kspd * 0.5, -turnspd * kspd * 0.5);
+    while (!digitalRead(D10_Pin))
     {
-        motorsWrite(-turnspd * kspd, turnspd * kspd);
     }
+    // motorsWrite(-turnspd * kspd*0.5, turnspd * kspd*0.5);
+    // while (!digitalRead(D7_Pin))
+    // {
+    // }
+    // pull_off();
+    // while (digitalRead(D9_Pin) || digitalRead(D10_Pin) || digitalRead(D11_Pin))
+    // {
+    //     motorsWrite(turnspd * kspd, -turnspd * kspd);
+    // }
     pull_off();
+    delay(300);
 }
 void pull_off()
 {
@@ -254,68 +273,68 @@ void go_n_steps(int n)
         }
         else if (D8 && !D9) //8通道在线上
         {
-            error = -2;
+            error = -1;
         }
         else if (D9 && !D8) //9通道在线上
         {
-            error = 2;
+            error = 1;
         }
         else if (D7) //7通道在线上
         {
-            error = -3;
+            error = -2;
         }
         else if (D10) //10通道在线上
         {
-            error = 3;
+            error = 2;
         }
         else if (D6) //6通道在线上
         {
-            error = -4;
+            error = -3;
         }
         else if (D11) //11通道在线上
         {
-            error = 4;
+            error = 3;
         }
         else if (D5) //5通道在线上
         {
-            error = -5;
+            error = -4;
         }
         else if (D12) //12通道在线上
         {
+            error = 4;
+        }
+        else if (D4) //4通道在线上
+        {
+            error = -5;
+        }
+        else if (D13) //13通道在线上
+        {
             error = 5;
         }
-        // else if (D4) //4通道在线上
-        // {
-        //     error = -5;
-        // }
-        // else if (D13) //13通道在线上
-        // {
-        //     error = 5;
-        // }
-        // else if (D3) //3通道在线上
-        // {
-        //     error = -6;
-        // }
-        // else if (D14) //14通道在线上
-        // {
-        //     error = 6;
-        // }
-        // else if (D2) //2通道在线上
-        // {
-        //     error = -7;
-        // }
-        // else if (D15) //15通道在线上
-        // {
-        //     error = 7;
-        // }
-        // else if (D1) //1通道在线上
-        // {
-        //     error = -8;
-        // }
-        // else if (D16) //16通道在线上
-        // {
-        //     error = 8;
-        // }
+        else if (D3) //3通道在线上
+        {
+            error = -6;
+        }
+        else if (D14) //14通道在线上
+        {
+            error = 6;
+        }
+        else if (D2) //2通道在线上
+        {
+            error = -7;
+        }
+        else if (D15) //15通道在线上
+        {
+            error = 7;
+        }
+        else if (D1) //1通道在线上
+        {
+            error = -8;
+        }
+        else if (D16) //16通道在线上
+        {
+            error = 8;
+        }
         else
             error = error * 0.9;
         calc_pid();
@@ -382,5 +401,5 @@ void setup()
 }
 void loop()
 {
-//  read_sensor_values();
+    //  read_sensor_values();
 }
